@@ -1,9 +1,0 @@
-11:29:02 **** Incremental Build of configuration Debug for project Getting Started ****
-Info: Internal Builder is used for build
-arm-frc-linux-gnueabi-g++ -std=c++1y -I/wpilib/cpp/current/include "-IC:\\Users\\Ryan Bacon\\Documents\\GitHub\\Komodo-4293-2016-Code\\Github Workspace\\Getting Started\\src" -O0 -g3 -Wall -c -fmessage-length=0 -o "src\\Robot.o" "..\\src\\Robot.cpp" 
-arm-frc-linux-gnueabi-g++: error: ..\src\Robot.cpp: No such file or directory
-arm-frc-linux-gnueabi-g++: fatal error: no input files
-compilation terminated.
-
-11:29:03 Build Finished (took 918ms)
-
