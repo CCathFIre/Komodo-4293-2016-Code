@@ -1,7 +1,8 @@
 #include "WPILib.h"
-
 class Robot: public IterativeRobot
 {
+
+	// This is a test
 
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
