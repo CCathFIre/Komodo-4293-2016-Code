@@ -1,0 +1,24 @@
+#ifndef _DEFINE_H
+#define _DEFINE_H
+
+#define GAMEPAD_CHANNEL		0
+
+//LEFT GAME PAD STICK X-Y AXIS
+#define GP_LSTICK_XAXIS
+#define GP_LSTICK_YAXIS
+
+//RIGHT GP STICK X-Y AXIS
+#define GP_RSTICK_XAXIS		4
+#define GP_RSTICK_YAXIS		5
+
+//GAMEPAD BUTTONS
+#define GP_Y_BUTTON		4
+#define GP_A_BUTTON		1
+
+//defining gamepad channel
+#define GAMEPAD_CHANNEL		2
+
+
+#define ROBOT_START_SPEED		0.75 	//DEFINING START SPEED
+
+#endif
