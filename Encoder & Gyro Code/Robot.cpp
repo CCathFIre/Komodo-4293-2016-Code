@@ -18,6 +18,8 @@ class Robot: public IterativeRobot
 
 	// For switching driving controls
 	int driveOption;
+	double joystickDifference;
+	double joystickAverage;
 
 	// To know what data will be put on the dashboard
 	bool showEncoderRaw;
@@ -28,6 +30,7 @@ class Robot: public IterativeRobot
 	AnalogGyro gyro;
 	bool showGyro;
 	double editedGyroRate;
+	double editedGyroAngle;
 
 	// Encoders
 	Encoder encoder1;
@@ -48,7 +51,7 @@ public:
 	{
 		myRobot.SetExpiration(0.1);
 
-		driveOption = 1;
+		driveOption = TANK_GAMEPAD;
 
 		gyro.InitGyro();
 		showGyro = true;
@@ -127,11 +130,16 @@ void Robot::TeleopPeriodic() {
 
 
 	// Edits the gyro data to account for drift
+	/*
+	editedGyroRate = gyro.GetRate();
 	if (gyro.GetRate() > GYRO_DRIFT_VALUE_MIN && gyro.GetRate() < GYRO_DRIFT_VALUE_MAX) {
 		editedGyroRate = 0;
 	} else {
 		editedGyroRate += GYRO_DRIFT_VALUE_AVERAGE;
 	}
+	*/
+
+	editedGyroRate = gyro.GetAngle();
 
 
 
@@ -139,8 +147,8 @@ void Robot::TeleopPeriodic() {
 
 	// Print gyro data
 	if (showGyro == true) {
-		SmartDashboard::PutNumber("Gyro Angle (Raw)", gyro.GetAngle()*GYRO_SCALE_FACTOR);
-		//SmartDashboard::PutNumber("Gyro Rate", gyro.GetRate());
+		SmartDashboard::PutNumber("Gyro Angle", gyro.GetAngle()*GYRO_SCALE_FACTOR);
+		SmartDashboard::PutNumber("Gyro Rate (Raw)", gyro.GetRate()*GYRO_SCALE_FACTOR);
 		SmartDashboard::PutNumber("Gyro Rate (Edited)", editedGyroRate*GYRO_SCALE_FACTOR);
 	}
 
@@ -179,38 +187,83 @@ void Robot::TestPeriodic() {
 ////////////////////////
 
 
+// To determine which drive control type the robot to use
+// In case user operator wants different controls
 void Robot::DriverControl(int driveControl) {
 	switch (driveControl) {
 	// Arcade drive (think racing games) w/ 1 joysticks
 	case ARCADE_1:
-		myRobot.ArcadeDrive(rStick.GetRawAxis(Y_AXIS), -rStick.GetRawAxis(X_AXIS));
+		// If the turn is outside the joystick's standard drift, robot will assume the robot is turning
+		// If not, robot will assume it is pushed, or has naturally drifted
+		if (fabs(rStick.GetRawAxis(X_AXIS)) > JOYSTICK_STANDARD_DRIFT) {
+			myRobot.ArcadeDrive(rStick.GetRawAxis(Y_AXIS), -rStick.GetRawAxis(X_AXIS));
+			gyro.Reset();
+		} else {
+			// The turn will be the opposite of what the gyro says the angle of unintentional drift is,
+			// which will have the robot go straight
+			myRobot.ArcadeDrive(rStick.GetRawAxis(Y_AXIS), editedGyroRate*GYRO_SCALE_FACTOR);
+		}
+
 		break;
 
 	// Arcade drive w/ 2 joysticks
 	case ARCADE_2:
-		myRobot.ArcadeDrive(-lStick.GetRawAxis(Y_AXIS), -rStick.GetRawAxis(X_AXIS));
+		if (fabs(rStick.GetRawAxis(X_AXIS)) > JOYSTICK_STANDARD_DRIFT) {
+			myRobot.ArcadeDrive(-lStick.GetRawAxis(Y_AXIS), -rStick.GetRawAxis(X_AXIS));
+			gyro.Reset();
+		} else {
+			myRobot.ArcadeDrive(-lStick.GetRawAxis(Y_AXIS), editedGyroRate*GYRO_SCALE_FACTOR);
+		}
+
 		break;
 
 	// Arcade drive w/ left stick on gamepad (the knockoff xbox controller)
 	case ARCADE_GAMEPAD_1:
-		myRobot.ArcadeDrive(gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_X));
+		if (fabs(gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_X)) > JOYSTICK_STANDARD_DRIFT) {
+			myRobot.ArcadeDrive(gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_X));
+			gyro.Reset();
+		} else {
+			myRobot.ArcadeDrive(gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), editedGyroRate*GYRO_SCALE_FACTOR);
+		}
+
 		break;
 
 	// Arcade drive w/ BOTH gamepad
 	case ARCADE_GAMEPAD_2:
-		myRobot.ArcadeDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_X));
+		if (fabs(gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_X)) > JOYSTICK_STANDARD_DRIFT) {
+			myRobot.ArcadeDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_X));
+			gyro.Reset();
+		} else {
+			myRobot.ArcadeDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), editedGyroRate*GYRO_SCALE_FACTOR);
+		}
+
 		break;
 
 	// Tank drive (requires 2 sticks; each stick controls its respective 'tread' or side;
 	//			   Ex: moving the right stick moves only the wheels on the right) w/ gamepad
 	case TANK_GAMEPAD:
-		myRobot.ArcadeDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_Y));
+		joystickDifference = gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y) - gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_Y);
+		joystickAverage = (gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y) + gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_Y))/2;
+		if (fabs(joystickDifference) > TANK_TURN_THRESHOLD) {
+			myRobot.TankDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_Y));
+			gyro.Reset();
+		} else {
+			myRobot.ArcadeDrive(joystickAverage, editedGyroRate*GYRO_SCALE_FACTOR);
+		}
+
 		break;
 
 	// Tank drive w/ joysticks
 	case TANK_2:
-		//myRobot.TankDrive(-rStick.GetRawAxis(RIGHT_STICK_Y), -lStick.GetRawAxis(LEFT_STICK_Y));
-		myRobot.TankDrive(-lStick.GetRawAxis(LEFT_STICK_Y), -rStick.GetRawAxis(RIGHT_STICK_Y));
+		joystickDifference = lStick.GetRawAxis(LEFT_STICK_Y) - rStick.GetRawAxis(RIGHT_STICK_Y);
+		joystickAverage = (lStick.GetRawAxis(LEFT_STICK_Y) + rStick.GetRawAxis(RIGHT_STICK_Y))/2;
+		if (fabs(joystickDifference) > TANK_TURN_THRESHOLD) {
+			myRobot.TankDrive(-lStick.GetRawAxis(LEFT_STICK_Y), -rStick.GetRawAxis(RIGHT_STICK_Y));
+			gyro.Reset();
+		} else {
+			myRobot.ArcadeDrive(joystickAverage, -rStick.GetRawAxis(RIGHT_STICK_Y));
+		}
+
 		break;
 	}
 }
