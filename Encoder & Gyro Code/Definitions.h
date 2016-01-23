@@ -34,6 +34,36 @@
 #define RIGHT_STICK_X   0
 #define RIGHT_STICK_Y   1
 
+// For the gamepad
+#define GAMEPAD_INPUT_CHANNEL	2
+
+
+// Gamepad button stuff
+#define GAMEPAD_LEFT_STICK_X		0
+#define GAMEPAD_LEFT_STICK_Y		1
+
+#define GAMEPAD_RIGHT_STICK_X		5
+#define GAMEPAD_RIGHT_STICK_Y		4
+
+#define GAMEPAD_LEFT_BUMPER			5
+#define GAMEPAD_RIGHT_BUMPER		6
+
+#define GAMEPAD_BUTTON_Y			4
+#define GAMEPAD_BUTTON_B			2
+#define GAMEPAD_BUTTON_A			1
+#define GAMEPAD_BUTTON_X			3
+
+
+// Drive modes
+#define ARCADE_1			1
+#define ARCADE_2			2
+
+#define ARCADE_GAMEPAD_1	3
+#define ARCADE_GAMEPAD_2	ARCADE_GAMEPAD_1 + 1
+
+#define TANK_GAMEPAD		ARCADE_GAMEPAD_2 + 1
+#define TANK_2				TANK_GAMEPAD + 1
+
 
 // Values for the encoders
 #define ENCODER_CHANNEL_1A		1
@@ -44,7 +74,11 @@
 
 
 // Gyro stuff
-#define GYRO_INPUT_CHANNEL		0
+#define GYRO_INPUT_CHANNEL			0
+#define GYRO_DRIFT_VALUE_MIN	   -1
+#define GYRO_DRIFT_VALUE_MAX		1
+#define GYRO_DRIFT_VALUE_AVERAGE	0
+#define GYRO_SCALE_FACTOR 			0.5
 
 
 //////////////////////////////////////////////

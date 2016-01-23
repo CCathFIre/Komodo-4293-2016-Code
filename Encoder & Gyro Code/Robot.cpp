@@ -13,6 +13,12 @@ class Robot: public IterativeRobot
 	Joystick rStick;
 	Joystick lStick;
 
+	// Gamepad
+	Joystick gamePad;
+
+	// For switching driving controls
+	int driveOption;
+
 	// To know what data will be put on the dashboard
 	bool showEncoderRaw;
 	bool showEncoderRate;
@@ -21,6 +27,7 @@ class Robot: public IterativeRobot
 	// Gyro stuff
 	AnalogGyro gyro;
 	bool showGyro;
+	double editedGyroRate;
 
 	// Encoders
 	Encoder encoder1;
@@ -32,6 +39,7 @@ public:
 		myRobot(0, 1),	// these must be initialized in the same order
 		rStick(RIGHT_JOYSTICK_INPUT_CHANNEL),		// as they are declared above.
 		lStick(LEFT_JOYSTICK_INPUT_CHANNEL),
+		gamePad(GAMEPAD_INPUT_CHANNEL),
 		lw(LiveWindow::GetInstance()),
 		autoLoopCounter(0),
 		gyro(GYRO_INPUT_CHANNEL),
@@ -40,6 +48,9 @@ public:
 	{
 		myRobot.SetExpiration(0.1);
 
+		driveOption = 1;
+
+		gyro.InitGyro();
 		showGyro = true;
 
 		showEncoderRaw = true;
@@ -55,6 +66,9 @@ private:
 	void TeleopPeriodic();
 
 	void TestPeriodic();
+
+
+	void DriverControl(int driveControl);
 };
 
 ////////////////////////////////////////
@@ -93,7 +107,9 @@ void Robot::AutonomousPeriodic() {
 	SmartDashboard::PutNumber("Encoder R get raw", encoder2.GetRaw());
 }
 
-//////
+
+////////////////////////
+
 
 // Starts at the beginning of the teleop (user controlled) period
 void Robot::TeleopInit() {
@@ -104,8 +120,18 @@ void Robot::TeleopInit() {
 void Robot::TeleopPeriodic() {
 	// Tank drive, both left and right joystick control their respective motor along the
 	// joystick's 'y' axis
-	//myRobot.TankDrive(-lStick.GetRawAxis(LEFT_STICK_Y), -rStick.GetRawAxis(RIGHT_STICK_Y));
-	myRobot.TankDrive(-rStick.GetRawAxis(RIGHT_STICK_Y), -lStick.GetRawAxis(LEFT_STICK_Y));
+	//myRobot.TankDrive(-rStick.GetRawAxis(RIGHT_STICK_Y), -lStick.GetRawAxis(LEFT_STICK_Y));
+
+	// Choose the teleop drive option
+	DriverControl(driveOption);
+
+
+	// Edits the gyro data to account for drift
+	if (gyro.GetRate() > GYRO_DRIFT_VALUE_MIN && gyro.GetRate() < GYRO_DRIFT_VALUE_MAX) {
+		editedGyroRate = 0;
+	} else {
+		editedGyroRate += GYRO_DRIFT_VALUE_AVERAGE;
+	}
 
 
 
@@ -113,8 +139,9 @@ void Robot::TeleopPeriodic() {
 
 	// Print gyro data
 	if (showGyro == true) {
-		SmartDashboard::PutNumber("Gyro Angle", gyro.GetAngle());
-		SmartDashboard::PutNumber("Gyro Rate", gyro.GetRate());
+		SmartDashboard::PutNumber("Gyro Angle (Raw)", gyro.GetAngle()*GYRO_SCALE_FACTOR);
+		//SmartDashboard::PutNumber("Gyro Rate", gyro.GetRate());
+		SmartDashboard::PutNumber("Gyro Rate (Edited)", editedGyroRate*GYRO_SCALE_FACTOR);
 	}
 
 
@@ -139,16 +166,60 @@ void Robot::TeleopPeriodic() {
 	}
 }
 
-//////
+
+////////////////////////
+
 
 // During every loop intervel of the test period
 void Robot::TestPeriodic() {
 	lw->Run();
 }
 
+
+////////////////////////
+
+
+void Robot::DriverControl(int driveControl) {
+	switch (driveControl) {
+	// Arcade drive (think racing games) w/ 1 joysticks
+	case ARCADE_1:
+		myRobot.ArcadeDrive(rStick.GetRawAxis(Y_AXIS), -rStick.GetRawAxis(X_AXIS));
+		break;
+
+	// Arcade drive w/ 2 joysticks
+	case ARCADE_2:
+		myRobot.ArcadeDrive(-lStick.GetRawAxis(Y_AXIS), -rStick.GetRawAxis(X_AXIS));
+		break;
+
+	// Arcade drive w/ left stick on gamepad (the knockoff xbox controller)
+	case ARCADE_GAMEPAD_1:
+		myRobot.ArcadeDrive(gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_X));
+		break;
+
+	// Arcade drive w/ BOTH gamepad
+	case ARCADE_GAMEPAD_2:
+		myRobot.ArcadeDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_X));
+		break;
+
+	// Tank drive (requires 2 sticks; each stick controls its respective 'tread' or side;
+	//			   Ex: moving the right stick moves only the wheels on the right) w/ gamepad
+	case TANK_GAMEPAD:
+		myRobot.ArcadeDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_Y));
+		break;
+
+	// Tank drive w/ joysticks
+	case TANK_2:
+		//myRobot.TankDrive(-rStick.GetRawAxis(RIGHT_STICK_Y), -lStick.GetRawAxis(LEFT_STICK_Y));
+		myRobot.TankDrive(-lStick.GetRawAxis(LEFT_STICK_Y), -rStick.GetRawAxis(RIGHT_STICK_Y));
+		break;
+	}
+}
+
+
 ////////////////////////////////////////
 /////////////   Divider!   /////////////
 ////////////////////////////////////////
+
 
 // Implements the 'Robot' class into the main robot loop
 START_ROBOT_CLASS(Robot)
