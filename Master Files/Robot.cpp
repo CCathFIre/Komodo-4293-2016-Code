@@ -1,6 +1,9 @@
 #include "WPILib.h"
 #include "Definitions.h"
 
+#include "Lifter.h"
+#include "BallManipulator.h"
+
 // My main robot class
 class Robot: public IterativeRobot
 {
@@ -39,6 +42,13 @@ class Robot: public IterativeRobot
 	Encoder encoder1;
 	Encoder encoder2;
 
+	Encoder lifterEncoder;
+	Encoder ballManipulatorEncoder;
+
+	// Manipulator classes
+	Lifter lifter;
+	BallManipulator ballManipulator;
+
 public:
 	// The initializer of dooooooom!!!!!
 	Robot() :
@@ -50,7 +60,11 @@ public:
 		autoLoopCounter(0),
 		gyro(GYRO_INPUT_CHANNEL),
 		encoder1(ENCODER_CHANNEL_1A, ENCODER_CHANNEL_1B),
-		encoder2(ENCODER_CHANNEL_2A, ENCODER_CHANNEL_2B)
+		encoder2(ENCODER_CHANNEL_2A, ENCODER_CHANNEL_2B),
+		lifterEncoder(LIFTER_ENCODER_CHANNEL_1, LIFTER_ENCODER_CHANNEL_2),
+		ballManipulatorEncoder(B_MANIPULATOR_ENCODER_CHANNEL_1, B_MANIPULATOR_ENCODER_CHANNEL_2),
+		lifter(LIFTER_CHANNEL, lifterEncoder),
+		ballManipulator(B_MANIPULATOR_CHANNEL, ballManipulatorEncoder)
 	{
 		myRobot.SetExpiration(0.1);
 
@@ -92,6 +106,8 @@ void Robot::AutonomousInit() {
 
 	encoder1.Reset();
 	encoder2.Reset();
+	lifterEncoder.Reset();
+	ballManipulatorEncoder.Reset();
 }
 
 // When the robot is on autonomous period, it will drive forwards at half speed for about two

@@ -73,12 +73,19 @@
 #define TANK_2				TANK_GAMEPAD + 1
 
 
+
 // Values for the encoders
 #define ENCODER_CHANNEL_1A		1
 #define ENCODER_CHANNEL_1B		2
 
 #define ENCODER_CHANNEL_2A		4
 #define ENCODER_CHANNEL_2B		5
+
+#define LIFTER_ENCODER_CHANNEL_1			0
+#define LIFTER_ENCODER_CHANNEL_2			1
+#define B_MANIPULATOR_ENCODER_CHANNEL_1		2
+#define B_MANIPULATOR_ENCODER_CHANNEL_2		3
+
 
 
 // Gyro stuff
@@ -91,15 +98,21 @@
 #define GYRO_DRIFT_VALUE			0.1
 
 
-////////////
+
 // Stuff for the manipulators below
+#define LIFTER_CHANNEL			0
 
 // Lifter speeds
-#define LIFTER_UP_SPEED		0
-#define LIFTER_DOWN_SPEED	0
+#define LIFTER_UP_SPEED			0
+#define LIFTER_DOWN_SPEED		0
 
+
+
+#define B_MANIPULATOR_CHANNEL		1
 
 // Ball Manipulator speeds
+#define B_MANIPULATOR_UP_SPEED		0
+#define B_MANIPULATOR_DOWN_SPEED	0
 
 
 

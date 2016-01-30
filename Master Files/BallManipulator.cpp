@@ -4,8 +4,18 @@
 
 
 
-BallManipulator::BallManipulator() {
-	// Doesn't do anything yet
+// DO NOT CALL
+BallManipulator::BallManipulator()
+	: motor(0)
+{
+
+}
+
+BallManipulator::BallManipulator(unsigned int jaguar, Encoder &eEncoder)
+	: motor(jaguar),
+	  ballManipulatorEncoder(&eEncoder)
+{
+	ballManipulatorEncoder->Reset();
 }
 
 
@@ -18,10 +28,10 @@ BallManipulator::BallManipulator() {
 
 // Sets the lifter to go up
 void BallManipulator::GoUp() {
-	//motor.SetSpeed(0);
+	motor.SetSpeed(B_MANIPULATOR_UP_SPEED);
 }
 
 // Sets the lifter to go down
 void BallManipulator::GoDown() {
-	//motor.SetSpeed(0);
+	motor.SetSpeed(B_MANIPULATOR_DOWN_SPEED);
 }

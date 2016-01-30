@@ -16,8 +16,9 @@
 //
 class Lifter {
 public:
-	// Our constructor class
-	Lifter();
+	// Our constructor classes
+	Lifter();	// DO NOT CALL
+	Lifter(unsigned int jaguar, Encoder &eEncoder);
 
 	// Classes to manually make the lifter go up or down
 	void GoUp();
@@ -25,6 +26,7 @@ public:
 
 private:
 	Jaguar motor;
+	Encoder *lifterEncoder;
 };
 
 

@@ -4,8 +4,18 @@
 
 
 
-Lifter::Lifter() {
+// DO NOT CALL
+Lifter::Lifter()
+	: motor(0)
+{
 	// Doesn't do anything yet
+}
+
+Lifter::Lifter(unsigned int jaguar, Encoder &eEncoder)
+	: motor(jaguar),
+	  lifterEncoder(&eEncoder)
+{
+	lifterEncoder->Reset();
 }
 
 
