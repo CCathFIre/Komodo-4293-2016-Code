@@ -86,7 +86,7 @@
 #define GYRO_DRIFT_VALUE_MIN	   -0.5
 #define GYRO_DRIFT_VALUE_MAX		0.5
 #define GYRO_DRIFT_VALUE_AVERAGE	0
-#define GYRO_SCALE_FACTOR 			0.015
+#define GYRO_SCALE_FACTOR 			0.03
 
 
 //////////////////////////////////////////////
