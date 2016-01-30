@@ -78,9 +78,13 @@ private:
 	void IncrementVariable(int &var, float delta);
 };
 
+
+
 ////////////////////////////////////////
 /////////////   Divider!   /////////////
 ////////////////////////////////////////
+
+
 
 // Starts at the beginning of the autonomous period
 void Robot::AutonomousInit() {
@@ -285,7 +289,9 @@ void Robot::DriverControl(int driveControl) {
 	}
 }
 
+
 ////////////////////////
+
 
 // Increments values of anything based on buttons on the gamepad
 // (Right bumper increases the value, Left bumper decreases)
@@ -308,9 +314,11 @@ void Robot::IncrementVariable(int &var, float delta) {
 }
 
 
+
 ////////////////////////////////////////
 /////////////   Divider!   /////////////
 ////////////////////////////////////////
+
 
 
 // Implements the 'Robot' class into the main robot loop

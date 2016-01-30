@@ -91,7 +91,16 @@
 #define GYRO_DRIFT_VALUE			0.1
 
 
-// For controlling the speed of the robot
+////////////
+// Stuff for the manipulators below
+
+// Lifter speeds
+#define LIFTER_UP_SPEED		0
+#define LIFTER_DOWN_SPEED	0
+
+
+// Ball Manipulator speeds
+
 
 
 //////////////////////////////////////////////
