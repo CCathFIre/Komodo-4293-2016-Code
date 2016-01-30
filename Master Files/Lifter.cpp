@@ -6,13 +6,15 @@
 
 // DO NOT CALL
 Lifter::Lifter()
-	: motor(0)
+	: liftMotor(0),
+	  tiltMotor(0)
 {
 	// Doesn't do anything yet
 }
 
-Lifter::Lifter(unsigned int jaguar, Encoder &eEncoder)
-	: motor(jaguar),
+Lifter::Lifter(unsigned int jaguarLift, unsigned int jaguarTilt, Encoder &eEncoder)
+	: liftMotor(jaguarLift),
+	  tiltMotor(jaguarTilt),
 	  lifterEncoder(&eEncoder)
 {
 	lifterEncoder->Reset();
@@ -27,11 +29,30 @@ Lifter::Lifter(unsigned int jaguar, Encoder &eEncoder)
 
 
 // Sets the lifter to go up
-void Lifter::GoUp() {
-	motor.SetSpeed(LIFTER_UP_SPEED);
+void Lifter::LiftUp() {
+	liftMotor.SetSpeed(LIFTER_UP_SPEED);
 }
 
 // Sets the lifter to go down
-void Lifter::GoDown() {
-	motor.SetSpeed(LIFTER_DOWN_SPEED);
+void Lifter::LiftDown() {
+	liftMotor.SetSpeed(LIFTER_DOWN_SPEED);
+
+}
+
+
+// Set the tilter to go up
+void Lifter::TiltUp() {
+	tiltMotor.SetSpeed(LIFTER_UP_SPEED);
+}
+
+// Sets the tilter to go down
+void Lifter::TiltDown() {
+	tiltMotor.SetSpeed(LIFTER_DOWN_SPEED);
+
+}
+
+
+void Lifter::StopAll() {
+	liftMotor.SetSpeed(0);
+	tiltMotor.SetSpeed(0);
 }

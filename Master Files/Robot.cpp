@@ -63,8 +63,8 @@ public:
 		encoder2(ENCODER_CHANNEL_2A, ENCODER_CHANNEL_2B),
 		lifterEncoder(LIFTER_ENCODER_CHANNEL_1, LIFTER_ENCODER_CHANNEL_2),
 		ballManipulatorEncoder(B_MANIPULATOR_ENCODER_CHANNEL_1, B_MANIPULATOR_ENCODER_CHANNEL_2),
-		lifter(LIFTER_CHANNEL, lifterEncoder),
-		ballManipulator(B_MANIPULATOR_CHANNEL, ballManipulatorEncoder)
+		lifter(LIFTER_CHANNEL_LIFT, LIFTER_CHANNEL_TILT, lifterEncoder),
+		ballManipulator(B_MANIPULATOR_CHANNEL_LIFT, B_MANIPULATOR_CHANNEL_PINCH, ballManipulatorEncoder)
 	{
 		myRobot.SetExpiration(0.1);
 
@@ -142,13 +142,16 @@ void Robot::TeleopInit() {
 
 // During every loop intervel of the teleop period
 void Robot::TeleopPeriodic() {
-	// Tank drive, both left and right joystick control their respective motor along the
-	// joystick's 'y' axis
-	//myRobot.TankDrive(-rStick.GetRawAxis(RIGHT_STICK_Y), -lStick.GetRawAxis(LEFT_STICK_Y));
-	//myRobot.TankDrive(-gamePad.GetRawAxis(GAMEPAD_LEFT_STICK_Y), -gamePad.GetRawAxis(GAMEPAD_RIGHT_STICK_Y));
-
 	// Choose the teleop drive option
 	DriverControl(driveOption);
+
+
+	// A simple thing to test a motor
+	if (gamePad.GetRawButton(GAMEPAD_BUTTON_A) == true)
+		ballManipulator.GoUp();
+	else
+		ballManipulator.StopAll();
+
 
 
 	// Edits the gyro rate to account for drift

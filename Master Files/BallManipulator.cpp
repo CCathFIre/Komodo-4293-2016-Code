@@ -6,13 +6,15 @@
 
 // DO NOT CALL
 BallManipulator::BallManipulator()
-	: motor(0)
+	: liftMotor(0),
+	  pinchMotor(0)
 {
 
 }
 
-BallManipulator::BallManipulator(unsigned int jaguar, Encoder &eEncoder)
-	: motor(jaguar),
+BallManipulator::BallManipulator(unsigned int jaguarLift, unsigned int jaguarPinch, Encoder &eEncoder)
+	: liftMotor(jaguarLift),
+	  pinchMotor(jaguarPinch),
 	  ballManipulatorEncoder(&eEncoder)
 {
 	ballManipulatorEncoder->Reset();
@@ -28,10 +30,25 @@ BallManipulator::BallManipulator(unsigned int jaguar, Encoder &eEncoder)
 
 // Sets the lifter to go up
 void BallManipulator::GoUp() {
-	motor.SetSpeed(B_MANIPULATOR_UP_SPEED);
+	pinchMotor.SetSpeed(B_MANIPULATOR_UP_SPEED);
 }
 
 // Sets the lifter to go down
 void BallManipulator::GoDown() {
-	motor.SetSpeed(B_MANIPULATOR_DOWN_SPEED);
+	liftMotor.SetSpeed(B_MANIPULATOR_DOWN_SPEED);
+}
+
+
+void BallManipulator::Open() {
+	liftMotor.SetSpeed(B_MANIPULATOR_UP_SPEED);
+}
+
+void BallManipulator::Close() {
+	pinchMotor.SetSpeed(B_MANIPULATOR_DOWN_SPEED);
+}
+
+
+void BallManipulator::StopAll() {
+	liftMotor.SetSpeed(0);
+	pinchMotor.SetSpeed(0);
 }

@@ -100,19 +100,21 @@
 
 
 // Stuff for the manipulators below
-#define LIFTER_CHANNEL			0
+#define LIFTER_CHANNEL_LIFT			0
+#define LIFTER_CHANNEL_TILT			0
 
 // Lifter speeds
-#define LIFTER_UP_SPEED			0
-#define LIFTER_DOWN_SPEED		0
+#define LIFTER_UP_SPEED				1
+#define LIFTER_DOWN_SPEED		   -1
 
 
 
-#define B_MANIPULATOR_CHANNEL		1
+#define B_MANIPULATOR_CHANNEL_LIFT		0
+#define B_MANIPULATOR_CHANNEL_PINCH		4
 
 // Ball Manipulator speeds
-#define B_MANIPULATOR_UP_SPEED		0
-#define B_MANIPULATOR_DOWN_SPEED	0
+#define B_MANIPULATOR_UP_SPEED			1
+#define B_MANIPULATOR_DOWN_SPEED	   -1
 
 
 

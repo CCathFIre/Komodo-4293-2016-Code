@@ -18,14 +18,17 @@ class BallManipulator {
 public:
 	// Our constructor class
 	BallManipulator();	// DO NOT CALL
-	BallManipulator(unsigned int jaguar, Encoder &eEncoder);
+	BallManipulator(unsigned int jaguarLift, unsigned int jaguarPinch, Encoder &eEncoder);
 
 	// Classes to manually make the lifter go up or down
 	void GoUp();
 	void GoDown();
+	void Open();
+	void Close();
+	void StopAll();
 
 private:
-	Jaguar motor;
+	Jaguar liftMotor, pinchMotor;
 	Encoder *ballManipulatorEncoder;
 };
 
