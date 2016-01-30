@@ -45,6 +45,9 @@ class Robot: public IterativeRobot
 	Encoder lifterEncoder;
 	Encoder ballManipulatorEncoder;
 
+	// A turn value for when the robot is in auto
+	double autoTurn;
+
 	// Manipulator classes
 	Lifter lifter;
 	BallManipulator ballManipulator;
@@ -74,8 +77,10 @@ public:
 		showGyro = true;
 
 		showEncoderRaw = true;
-		showEncoderRate = true;
+		showEncoderRate = false;
 		showEncoderIndex = false;
+
+		autoTurn = 0;
 	}
 
 private:
@@ -122,8 +127,31 @@ void Robot::AutonomousPeriodic() {
 	}
 	*/
 
-	// Correct course (adjust for physical motor imperfections) based on encoders
 
+
+	// Edits the gyro angle to account for drift
+	if (fabs(gyro.GetRate()) > GYRO_DRIFT_VALUE)
+		editedGyroAngle = gyro.GetAngle();
+	else {
+		gyro.Reset();
+		editedGyroAngle = 0;
+	}
+
+
+
+	// Adjust course based on gyro data
+	if (editedGyroAngle > 0)
+		autoTurn = 0.3;
+	else if (editedGyroAngle < 0)
+		autoTurn = -0.3;
+	else
+		autoTurn = 0;
+
+	// Go foward 3 feet at 1/3 speed, stop (adjusting for drift)
+	if (encoder1.GetRaw() < ONE_FOOT_LEFT_ENCODER*3 || encoder2.GetRaw() < ONE_FOOT_RIGHT_ENCODER*3)
+		myRobot.Drive(0.3, autoTurn);
+	else
+		myRobot.Drive(0.0, 0.0);
 
 
 	// Print the raw encoder data
@@ -179,6 +207,12 @@ void Robot::TeleopPeriodic() {
 
 
 
+	// To reset encoder data for the wheels
+	if (gamePad.GetRawButton(GAMEPAD_BUTTON_Y) == true) {
+			encoder1.Reset();
+			encoder2.Reset();
+	}
+
 	// Print gyro data
 	if (showGyro == true) {
 		SmartDashboard::PutNumber("Gyro Angle (Raw)", gyro.GetAngle()*GYRO_SCALE_FACTOR);
@@ -190,11 +224,11 @@ void Robot::TeleopPeriodic() {
 
 	// Print out the encoder data
 	// Raw encoder data
-	if (showEncoderRaw == true) {
+//	if (showEncoderRaw == true) {
 		SmartDashboard::PutNumber("Encoder L get raw", encoder1.GetRaw());
 		SmartDashboard::PutNumber("Encoder R get raw", encoder2.GetRaw());
 
-	}
+//	}
 
 	// The delta encoder change
 	if (showEncoderRate == true) {
