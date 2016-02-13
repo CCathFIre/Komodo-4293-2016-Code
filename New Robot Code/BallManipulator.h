@@ -27,8 +27,16 @@ public:
 	void Close();
 	void StopAll();
 
+	// A function to test the servo motor
+	void testMotorPanToMax();
+	void testMotorPanToMin();
+
 private:
 	Jaguar liftMotor, pinchMotor;
+
+	Servo testMotor;
+	float testMotorRange, testMotorMinAngle, testMotorMaxAngle;
+
 	Encoder *ballManipulatorEncoder;
 };
 

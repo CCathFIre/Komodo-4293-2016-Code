@@ -7,7 +7,8 @@
 // DO NOT CALL
 BallManipulator::BallManipulator()
 	: liftMotor(0),
-	  pinchMotor(0)
+	  pinchMotor(0),
+	  testMotor(0)
 {
 
 }
@@ -15,9 +16,14 @@ BallManipulator::BallManipulator()
 BallManipulator::BallManipulator(unsigned int jaguarLift, unsigned int jaguarPinch, Encoder &eEncoder)
 	: liftMotor(jaguarLift),
 	  pinchMotor(jaguarPinch),
+	  testMotor(9),
 	  ballManipulatorEncoder(&eEncoder)
 {
 	ballManipulatorEncoder->Reset();
+
+	testMotorMaxAngle = testMotor.GetMaxAngle();
+	testMotorMinAngle = testMotor.GetMinAngle();
+	testMotorRange = testMotorMaxAngle - testMotorMinAngle;
 }
 
 
@@ -51,4 +57,28 @@ void BallManipulator::Close() {
 void BallManipulator::StopAll() {
 	liftMotor.SetSpeed(0);
 	pinchMotor.SetSpeed(0);
+}
+
+void BallManipulator::testMotorPanToMax() {
+	// Go go through the range of angles, starting from the min to max
+	//for (float angle = testMotorMinAngle; angle<testMotorMaxAngle; angle+=testMotorRange/10.0) {
+	//	// Set to the angle
+	//	testMotor.SetAngle(angle);
+		// Wait 1 second
+	//	Wait(1.0);
+	//}
+
+	testMotor.SetAngle(testMotorMaxAngle);
+}
+
+void BallManipulator::testMotorPanToMin() {
+	// Go go through the range of angles, starting from the max to min
+	//for (float angle = testMotorMaxAngle; angle>testMotorMinAngle; angle-=testMotorRange/10.0) {
+		// Set to the angle
+	//	testMotor.SetAngle(angle);
+		// Wait 1 second
+	//	Wait(1.0);
+	//}
+
+	testMotor.SetAngle(testMotorMinAngle);
 }

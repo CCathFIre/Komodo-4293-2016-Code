@@ -56,6 +56,13 @@ class Robot: public IterativeRobot
 	Lifter lifter;
 	BallManipulator ballManipulator;
 
+	// For when we press 'A', it goes up. When we press it again, it goes down. These variables help
+	// do that
+	bool servoDoneFlag;
+	// 0: Min->Max
+	// 1: Max->Min
+	int servoActionType;
+
 public:
 	// The initializer of dooooooom!!!!!
 	Robot() :
@@ -86,6 +93,9 @@ public:
 		showDriveControl = true;
 
 		autoTurn = 0;
+
+		servoDoneFlag = false;
+		servoActionType = 0;
 	}
 
 private:
@@ -195,6 +205,24 @@ void Robot::TeleopPeriodic() {
 	ButtonControl();
 
 
+	// When you press A, it has the motor pan from its minimum to maximum angles
+	// When you press it again, it goes from the max to min
+	if (gamePad.GetRawButton(GAMEPAD_BUTTON_A)) {
+		if (!servoDoneFlag) {
+			if (servoActionType == 0) {
+				ballManipulator.testMotorPanToMax();
+				servoActionType = 1;
+			} else if (servoActionType == 1) {
+				ballManipulator.testMotorPanToMin();
+				servoActionType = 0;
+			}
+		}
+
+		servoDoneFlag = true;
+	} else {
+		servoDoneFlag = false;
+	}
+
 
 	// Edits the gyro angle to account for drift
 	if (fabs(gyro.GetRate()) > GYRO_DRIFT_VALUE && fabs(gyro.GetRate()) < GYRO_RUSH_SPEED && isGyroDrive == true)
@@ -206,14 +234,14 @@ void Robot::TeleopPeriodic() {
 
 	//Print Drive Mode
 	if(showDriveControl == true) {
-	SmartDashboard::PutNumber("Drive Mode = ", driveOption);
-	SmartDashboard::PutNumber("Joystick Arcade = ", ARCADE_1);
-	SmartDashboard::PutNumber("Split Joystick Arcade = ", ARCADE_2);
-	SmartDashboard::PutNumber("Gamepad Arcade = ", ARCADE_GAMEPAD_1);
-	SmartDashboard::PutNumber("Split Gamepad Arcade = ", ARCADE_GAMEPAD_2);
-	SmartDashboard::PutNumber("Gamepad Tank = ", TANK_GAMEPAD);
-	SmartDashboard::PutNumber("Joystick Tank = ", TANK_2);
-	SmartDashboard::PutNumber("isGyroDrive",isGyroDrive);
+	    SmartDashboard::PutNumber("Drive Mode = ", driveOption);
+	    SmartDashboard::PutNumber("Joystick Arcade = ", ARCADE_1);
+	    SmartDashboard::PutNumber("Split Joystick Arcade = ", ARCADE_2);
+	    SmartDashboard::PutNumber("Gamepad Arcade = ", ARCADE_GAMEPAD_1);
+	    SmartDashboard::PutNumber("Split Gamepad Arcade = ", ARCADE_GAMEPAD_2);
+	    SmartDashboard::PutNumber("Gamepad Tank = ", TANK_GAMEPAD);
+	    SmartDashboard::PutNumber("Joystick Tank = ", TANK_2);
+	    SmartDashboard::PutNumber("isGyroDrive",isGyroDrive);
 	}
 
 	//Printt Gyro scale factor
@@ -419,7 +447,7 @@ void Robot::ButtonControl() {
 	}
 	// To reset encoder data for the wheels
 
-if(gamePad.GetRawButton(GAMEPAD_BUTTON_X)== true && buttonDone[GAMEPAD_BUTTON_X]== false){
+    if(gamePad.GetRawButton(GAMEPAD_BUTTON_X)== true && buttonDone[GAMEPAD_BUTTON_X]== false){
 		buttonDone[GAMEPAD_BUTTON_X] = true;
 
 	} else if(gamePad.GetRawButton(GAMEPAD_BUTTON_X) == false && buttonDone[GAMEPAD_BUTTON_X] == true){
